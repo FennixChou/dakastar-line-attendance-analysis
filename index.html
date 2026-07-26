@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>打卡之星 DakaStar 深度分析報告｜如菓適用性評估（2026-07）</title>
+<style>
+  :root{
+    --bg:#F2ECDF; --surface:#FCFAF4; --surface-2:#F7F1E6; --ink:#22271F; --muted:#62665A;
+    --line:#E4DCCB; --primary:#34573B; --primary-strong:#274430; --primary-soft:rgba(52,87,59,.10);
+    --primary-line:rgba(52,87,59,.30); --clay:#8F6234; --warn:#96611B; --danger:#AF4636;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15170F; --surface:#1E2016; --surface-2:#24271B; --ink:#ECE9DE; --muted:#9D9B88;
+      --line:#2F3123; --primary:#9BC084; --primary-strong:#B4D49E; --primary-soft:rgba(155,192,132,.14);
+      --primary-line:rgba(155,192,132,.38); --clay:#CB9C6E; --warn:#E0AC5B; --danger:#E0806F;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15170F; --surface:#1E2016; --surface-2:#24271B; --ink:#ECE9DE; --muted:#9D9B88;
+    --line:#2F3123; --primary:#9BC084; --primary-strong:#B4D49E; --primary-soft:rgba(155,192,132,.14);
+    --primary-line:rgba(155,192,132,.38); --clay:#CB9C6E; --warn:#E0AC5B; --danger:#E0806F;
+  }
+  :root[data-theme="light"]{
+    --bg:#F2ECDF; --surface:#FCFAF4; --surface-2:#F7F1E6; --ink:#22271F; --muted:#62665A;
+    --line:#E4DCCB; --primary:#34573B; --primary-strong:#274430; --primary-soft:rgba(52,87,59,.10);
+    --primary-line:rgba(52,87,59,.30); --clay:#8F6234; --warn:#96611B; --danger:#AF4636;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--ink); margin:0;
+    font-family:"Segoe UI","Microsoft JhengHei","PingFang TC","Noto Sans TC",system-ui,sans-serif;
+    font-size:16px; line-height:1.75;
+  }
+  .wrap{max-width:860px; margin:0 auto; padding:44px 22px;}
+  header.doc h1{font-size:1.55rem; font-weight:600; margin:0 0 6px; text-wrap:balance;}
+  .meta{color:var(--muted); font-size:.88rem; margin:0 0 28px;}
+  h2{font-size:1.15rem; font-weight:600; margin:38px 0 12px;}
+  h3{font-size:1rem; font-weight:600; margin:18px 0 6px;}
+  p{margin:0 0 12px;}
+  .verdict{background:var(--surface); border:1px solid var(--primary-line); border-radius:10px;
+           padding:18px 20px; box-shadow:inset 3px 0 0 var(--primary);}
+  .verdict .headline{font-size:1.15rem; font-weight:600; color:var(--primary); margin-bottom:6px;}
+  .pill{display:inline-block; border-radius:999px; padding:1px 11px; font-size:.76rem; letter-spacing:.05em;
+        background:var(--primary-soft); color:var(--primary); border:1px solid var(--primary-line);}
+  .pill.warn{background:transparent; color:var(--warn); border-color:var(--warn);}
+  .pill.danger{background:transparent; color:var(--danger); border-color:var(--danger);}
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin:14px 0;}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
+  .card h3{margin-top:0;}
+  .card p,.card li{font-size:.92rem;}
+  .card ul{margin:0; padding-left:1.2em;}
+  .tablebox{overflow-x:auto; border:1px solid var(--line); border-radius:10px; background:var(--surface); margin:12px 0;}
+  table{border-collapse:collapse; width:100%; min-width:720px; font-size:.92rem;}
+  th{background:var(--surface-2); color:var(--muted); font-size:.76rem; letter-spacing:.05em; font-weight:600;
+     text-align:left; padding:10px 12px; white-space:nowrap;}
+  td{padding:10px 12px; border-top:1px solid var(--line); vertical-align:top;}
+  td.num{font-variant-numeric:tabular-nums; white-space:nowrap;}
+  .ok{color:var(--primary); font-weight:600;}
+  .warn-t{color:var(--warn); font-weight:600;}
+  .danger-t{color:var(--danger); font-weight:600;}
+  .note{color:var(--muted); font-size:.88rem;}
+  ol,ul{margin:0 0 12px; padding-left:1.35em;}
+  li{margin-bottom:6px;}
+  ol.ask li{margin-bottom:8px;}
+  a{color:var(--primary); text-decoration-thickness:1px; text-underline-offset:3px;}
+  a:hover{color:var(--primary-strong);}
+  .src{font-size:.88rem; color:var(--muted);}
+  .src a{overflow-wrap:anywhere;}
+  .flow{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px; margin:12px 0;}
+  .flow ol{margin-bottom:0;}
+  footer{margin-top:40px; padding-top:14px; border-top:1px solid var(--line); color:var(--muted); font-size:.88rem;}
+  @media print{
+    :root{ --bg:#FFFFFF; --surface:#FFFFFF; --surface-2:#F4EFE3; }
+    .wrap{max-width:none; padding:0;}
+    .tablebox{overflow:visible;}
+    table{min-width:0; font-size:.72rem;}
+    th,td,td.num{white-space:normal; padding:7px 8px;}
+    .card,.tablebox,tr,.verdict,.flow{break-inside:avoid;}
+    a{text-decoration:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="doc">
+    <h1>打卡之星 DakaStar 深度分析報告</h1>
+    <p class="meta">如菓室內裝修・導入評估｜查證日 2026-07-26｜五路獨立研究＋交叉複核，關鍵宣稱皆經官網原文逐字複核；查不到的一律標「需問業務」，不以推測填補</p>
+  </header>
+
+  <div class="verdict">
+    <div class="headline">結論：有條件適合——先實測、帶清單問業務，再簽</div>
+    <p>對如菓（5–15 人、工班監工常駐外部工地）而言，打卡之星的核心賣點都經官網原文證實：<strong>員工端只要 LINE＋Email，完全免裝 App</strong>、GPS／WiFi／QR code 多方式打卡、多地點支援、官方明講適合「5–10 人小微企業」；促銷買斷價 NT$2,800 的試錯成本極低、還有 14 天退款。</p>
+    <p>但三件對工地最要命的事<strong>官網完全沒有答案</strong>：①GPS 訊號死角（地下室／鋼構層）怎麼容錯 ②斷網或 LINE 當機時怎麼補卡 ③多工地能不能分權限管理。加上市面上<strong>幾乎查無可核實的第三方真實評價</strong>（聲量小的利基產品），所以不建議直接下單——先要 demo 帳號到工地實測兩週、把本報告第七章的 16 題問完拿到書面回覆，再決定。</p>
+  </div>
+
+  <h2>一、快速判定表</h2>
+  <div class="cards">
+    <div class="card">
+      <h3><span class="pill">已證實的優勢</span></h3>
+      <ul>
+        <li>免裝 App（官網原文：「不需要下載 APP 喔！只要有 LINE、Email、一支手機」）</li>
+        <li>GPS／WiFi／QR／IP 四種打卡、多地點、外勤支援</li>
+        <li>官方明講適合 5–10 人小微企業</li>
+        <li>買斷 A 方案 NT$2,800（原價 7,800、限量 200 名）＋14 天退款</li>
+        <li>開發商公司登記 8 年、資本額 500 萬、LINE 官方故事頁背書</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="pill warn">未解的工地關鍵</span></h3>
+      <ul>
+        <li>GPS 死角（地下室／鋼構）容錯機制：官網未載</li>
+        <li>斷網／LINE 當機時的補卡與資料保全:官網未載</li>
+        <li>多工地分權限管理員：官網未載</li>
+        <li>多地點有無數量上限或加價：官網未載</li>
+        <li>A 方案是否含報表匯出：兩處查詢矛盾，需業務確認</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="pill danger">風險提示</span></h3>
+      <ul>
+        <li>第三方真實評價幾乎查無（聲量小；網傳滿意度數字無法核實，不採信）</li>
+        <li>管理後台由第三方平台（teaches.cc）代管，資料依存性待釐清</li>
+        <li>LINE 推播只送 6 個月，之後按 LINE 官方售價另計</li>
+        <li>資安認證、資料機房、倒閉時資料匯出承諾：皆未揭露</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>二、開發商是誰？可靠嗎？</h2>
+  <p><strong>知識發展股份有限公司</strong>（統編 55799599），2018 年 1 月設立、資本額 NT$500 萬、登記於台北市中山區松江路 76 號 9 樓，代表人楊耀凱，狀態營業中。有正式的隱私權政策與使用條款頁面，並登上 LINE 官方合作故事頁。</p>
+  <p class="note">盡調缺口（簽約前建議取得書面回覆）：資安認證（如 ISO 27001）、資料機房位置、公司停業時的資料匯出機制、導入企業數的可稽核佐證——官網皆未揭露；服務條款免責範圍偏寬且未見資料匯出承諾。</p>
+
+  <h2>三、使用場景：如菓的一天怎麼用</h2>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>場景</th><th>怎麼運作</th><th>證據狀態</th></tr></thead>
+      <tbody>
+        <tr><td>內勤在辦公室上下班</td><td>LINE 一鍵打卡，WiFi 或 GPS 圈定辦公室範圍</td><td class="ok">官網證實</td></tr>
+        <tr><td>工班在工地簽到退</td><td>GPS 多地點打卡；管理員在地圖上圈定各工地允許範圍；可拍照上傳佐證</td><td class="ok">功能證實<span class="note">（設定細節未載）</span></td></tr>
+        <tr><td>監工一天跑多個工地</td><td>多地點打卡支援外勤；地點怎麼切換、有無數量上限</td><td class="warn-t">需業務確認</td></tr>
+        <tr><td>訊號死角（地下室／鋼構層）</td><td>理論上可改 WiFi／QR code 打卡，是否自動切換備援</td><td class="warn-t">需業務確認</td></tr>
+        <tr><td>員工請假、查特休</td><td>LINE 內申請假單、查剩餘特休；B 方案以上可設多層簽核</td><td class="ok">官網證實</td></tr>
+        <tr><td>忘打卡</td><td>系統推播提醒＋事後補打卡（附備註）</td><td class="ok">官方影片提及</td></tr>
+        <tr><td>月底算薪</td><td>自動統計時數／遲到早退／請假，匯出 Excel 給會計；C 方案以上全自動計薪</td><td class="warn-t">A 方案是否含匯出待確認</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>四、費用怎麼算</h2>
+  <p>官網同時掛著<strong>兩套制度</strong>：促銷頁的「限時買斷制」與正式價目頁的「訂閱制」。官網 FAQ 明講「優惠期間額滿回到訂閱制」——也就是<strong>買斷是限時特案、訂閱才是常態價</strong>。</p>
+  <div class="tablebox">
+    <table>
+      <thead><tr><th>方案</th><th>價格</th><th>人數</th><th>含什麼</th><th>如菓需要嗎</th></tr></thead>
+      <tbody>
+        <tr><td><strong>A 打卡</strong></td><td class="num">$2,800 一次買斷</td><td>不限人數（官網原文；另頁稱限中小企業，以合約版本為準）</td><td>LINE/GPS/WiFi/QR 打卡、多地點、事病假特休計算、員工帳號管理、打卡報表（匯出待確認）</td><td class="ok">核心需求都在這層</td></tr>
+        <tr><td><strong>B 打卡＋簽核</strong></td><td class="num">$19,800 一次買斷</td><td>50 人以下</td><td>A 全部＋請假/加班/補卡多層簽核、休假行事曆</td><td>要正式簽核流程再升</td></tr>
+        <tr><td>C 自動計薪</td><td class="num">$38,800 一次買斷</td><td>50 人以下</td><td>B 全部＋全自動算薪（扣款/代金/加班倍率/法定代扣）＋薪資顧問</td><td>會計流程成熟前不急</td></tr>
+        <tr><td>D 數位培訓</td><td class="num">$88,000 一次買斷</td><td>50 人以下</td><td>C 全部＋新人培訓/測驗/發證</td><td class="danger-t">用不到</td></tr>
+        <tr><td>訂閱制（常態）</td><td class="num">$100/人/月，最低 10 人、年繳</td><td>10 人為單位</td><td>如菓 10 人＝$12,000/年；系統升級維護免費（官網原文）</td><td>買斷若下架的替代路</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>要留意的延伸費用（官網有寫但藏在活動頁）</h3>
+  <ul>
+    <li><strong>LINE 推播通知只贈送 6 個月</strong>，之後「價格參考 LINE 官方售價」另計——每月實際多少錢，列入必問。</li>
+    <li><strong>簡訊服務超過免費額度後按量計價</strong>——額度幾則、超額單價，列入必問。</li>
+    <li>買斷制次年有無雲端主機費／維護費：官網只在訂閱頁保證「升級維護免費」，買斷頁未提——列入必問。</li>
+    <li>14 天退款的條款細節（要不要理由、含不含加購）：未載——列入必問。</li>
+  </ul>
+  <p class="note">對照組：前次比較的 WebTA 訂閱制為 $38/人/月（年繳 $342/人/年未稅、最低 10 人≈$3,420/年）。若打卡之星 A 方案買斷屬實且含報表匯出，一次 $2,800 從第二年起就比誰都便宜；若買斷已下架，其訂閱價（$12,000/年）反而比 WebTA 貴 3.5 倍。</p>
+
+  <h2>五、實際怎麼操作？要另外裝 App 嗎？</h2>
+  <div class="flow">
+    <h3 style="margin-top:0">員工端（免裝 App——官網原文逐字證實）</h3>
+    <ol>
+      <li>管理員在後台幫員工開通帳號</li>
+      <li>員工點「加入 LINE」綁定打卡之星官方帳號（只要有 LINE＋Email）</li>
+      <li>之後每天在 LINE 聊天室一鍵打上下班卡；GPS／WiFi／QR code／IP 四種方式，可拍照上傳佐證</li>
+      <li>LINE 內就能：查出勤紀錄、申請請假、查剩餘特休、收忘打卡提醒、看薪資單（需再輸密碼）</li>
+    </ol>
+  </div>
+  <div class="flow">
+    <h3 style="margin-top:0">管理端（網頁後台，瀏覽器操作）</h3>
+    <ol>
+      <li>後台為網頁版（由第三方平台 teaches.cc 代管），內建智能客服＋說明中心；購買後寄「啟用信」附教學影片</li>
+      <li>初始設定：匯入員工資料 → 地圖圈定各打卡地點與範圍（辦公室＋各工地）→ 設定班表／假別／簽核鏈（B 以上）</li>
+      <li>日常：看出勤儀表板、審核假單補卡、月底匯出 Excel 報表給會計</li>
+    </ol>
+    <p class="note">唯一查到的第三方導入心得稱初始設定花了兩天（員工匯入＋地點圈選＋權限最耗時）——該文原始連結已失效無法核實，僅供方向參考。官網不公開分步教學截圖，深入評估請業務給 demo 帳號。</p>
+  </div>
+  <p><strong>直答老闆的問題</strong>：員工<strong>不用</strong>另外裝 App（LINE 就是入口）；管理者用<strong>網頁</strong>後台（電腦或手機瀏覽器）。App 商店裡的「DAKA 打卡鐘」與本系統的關係官網未說明，不影響上述結論。</p>
+
+  <h2>六、市場評價（誠實揭露：查不到就是查不到）</h2>
+  <ul>
+    <li>PTT／Dcard／Mobile01 <strong>查無可核實的真實使用者實測文</strong>；一個自稱 PTT 的來源經查核是賭博內容農場（已排除）；一篇部落格心得原文已 404。</li>
+    <li>網傳「92% 推薦率」等滿意度數字<strong>無法在原始頁面核實，不予採信</strong>。</li>
+    <li>二手摘要中反覆出現的方向性缺點（無法逐字溯源，僅供實測時驗證）：室內／地下室 GPS 不準、斷網無法打卡、LINE 當機風險、報表格式固定會計要手動調。</li>
+    <li>評價稀少本身就是重要訊號：這是聲量小的利基產品——低價的另一面是生態小、可參考經驗少，所以「先實測再簽」比什麼都重要。</li>
+  </ul>
+
+  <h2>七、下單前打給業務的 16 題（可照唸）</h2>
+  <ol class="ask">
+    <li>A 方案「不限人數」是最終版本嗎？會寫進合約嗎？</li>
+    <li>A 方案含不含出勤報表匯出？格式是 Excel 還是 CSV？</li>
+    <li>買斷方案次年起要不要另付雲端主機費、資料保存費或維護費？</li>
+    <li>這次限量買斷活動確切到期日是哪一天？</li>
+    <li>LINE 推播贈送 6 個月之後，每月／每則大概多付多少？</li>
+    <li>簡訊免費額度幾則？超過後單價多少？</li>
+    <li>14 天退款要不要附理由？已用的加購模組能退嗎？</li>
+    <li>有沒有安裝費、教育訓練費？</li>
+    <li>員工數若超過方案上限，補差額還是重買？</li>
+    <li>多個工地同時在工，「多地點打卡」怎麼設定？有沒有數量上限或額外費用？</li>
+    <li>GPS 在地下室、鋼構樓層打卡失敗時系統怎麼處理？有沒有 WiFi／QR 自動備援？</li>
+    <li>斷網或 LINE 官方帳號當掉時，員工怎麼補打卡？資料會不會掉？</li>
+    <li>能不能設多組管理員，各管各的工地／工班？</li>
+    <li>資料放在哪個機房？有沒有 ISO 27001 等資安認證？</li>
+    <li>若貴公司停業，我們能不能自行匯出全部出勤與薪資歷史資料？</li>
+    <li>可以先給一組 demo 帳號讓我們到工地實測 GPS 準確度嗎？</li>
+  </ol>
+
+  <h2>八、建議行動順序</h2>
+  <ol>
+    <li><strong>要 demo 帳號</strong>（第 16 題），選一個有地下室或鋼構的工地實測兩週：GPS 準度、訊號死角、斷網情境。</li>
+    <li>16 題問完，<strong>關鍵題（1、2、3、4、11、12、15）要書面回覆</strong>再下單。</li>
+    <li>若「不限人數＋含報表匯出」證實 → <strong>先買 A 方案 $2,800</strong>：試錯成本低、14 天可退；簽核需求成形再升 B。</li>
+    <li>與 WebTA 平行試用對比後擇一，避免單一選項議價劣勢。</li>
+  </ol>
+
+  <h2>來源</h2>
+  <p class="src">
+    官方：<a href="https://www.dakastar.com.tw/">官網</a>・<a href="https://www.dakastar.com.tw/pricing">價目頁</a>・<a href="https://www.dakastar.com.tw/campaign/landing2-a">A方案</a>・<a href="https://www.dakastar.com.tw/campaign/landing2-b">B方案</a>・<a href="https://www.dakastar.com.tw/campaign/landing2-c">C方案</a>・<a href="https://www.dakastar.com.tw/campaign/landing2-d">D方案</a>・<a href="https://www.dakastar.com.tw/campaign2601-2">買斷優惠總覽</a>・<a href="https://www.dakastar.com.tw/privacy">隱私權政策</a>・<a href="https://www.dakastar.com.tw/policies">使用條款</a>・<a href="https://www.youtube.com/@DakaStar_tw">官方 YouTube</a>・<a href="https://www.youtube.com/watch?v=oV1kzT59Zak">客戶見證影片</a>・<a href="https://protostar.line.me/zh/stories/dakastar">LINE 官方故事頁</a><br>
+    公司登記：<a href="https://twincn.com/item.aspx?no=55799599">台灣公司網（統編 55799599）</a>・<a href="https://mygov.tw/company/55799599">mygov.tw</a><br>
+    其他：<a href="https://www.threads.com/@dakastar_tw/post/DRBfsWbksCf/">Threads 官方帳號</a>・<a href="https://teaches.cc/admin/">管理後台登入頁</a>
+  </p>
+
+  <footer>查證日 2026-07-26；價格與方案以官方當日公告為準，促銷可能隨時下架。本報告為如菓內部導入評估，非業配；無法核實的宣稱一律標註，未以推測填補。</footer>
+</div>
+</body>
+</html>
